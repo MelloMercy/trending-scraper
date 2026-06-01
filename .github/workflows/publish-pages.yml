@@ -15,6 +15,7 @@ on:
     branches: [main]
     paths:
       - "feeds/**"
+      - "!feeds/README.md"  # docs change shouldn't trigger a deploy
   workflow_dispatch:
 
 permissions:
@@ -59,6 +60,11 @@ jobs:
           </ul>
           HTML
       - uses: actions/configure-pages@v5
+        with:
+          # Auto-enable Pages (build_type: workflow) on first run, so no manual
+          # Settings -> Pages toggle is needed. Falls back to a clear error if
+          # the token lacks permission — then enable it manually once.
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

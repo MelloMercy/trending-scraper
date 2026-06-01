@@ -20,6 +20,7 @@ on:
     branches: [main]
     paths:
       - "feeds/**"
+      - "!feeds/README.md"  # docs change shouldn't trigger a sync
   workflow_dispatch:
 
 jobs:
