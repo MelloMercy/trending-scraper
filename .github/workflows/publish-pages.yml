@@ -1,0 +1,66 @@
+name: publish-pages
+
+# Publishes feeds/*.json to GitHub Pages as a static CDN, giving clean URLs like
+#   https://<owner>.github.io/<repo>/latest.json
+# with proper content-type, CORS, and caching (better than raw.githubusercontent).
+#
+# One-time setup: repo Settings -> Pages -> Build and deployment -> Source:
+# "GitHub Actions". After that, every push that changes feeds/ redeploys.
+#
+# The local machine still owns scraping; it commits feeds/*.json (e.g. via
+# `python scripts/publish_feed.py --target git`) and this workflow does the rest.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "feeds/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment; let an in-progress run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Validate feed JSON before publishing
+        run: python scripts/validate_feed.py
+      - name: Assemble site
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+          cp feeds/*.json _site/
+          snap="$(python -c "import json;print(json.load(open('feeds/latest.json'))['snapshot_date'])")"
+          cat > _site/index.html <<HTML
+          <!doctype html><meta charset="utf-8">
+          <title>trending-scraper public feed</title>
+          <h1>Public feed</h1>
+          <p>Latest snapshot: <strong>${snap}</strong></p>
+          <ul>
+            <li><a href="latest.json">latest.json</a> (all regions)</li>
+            <li><a href="latest-cn.json">latest-cn.json</a></li>
+            <li><a href="latest-intl.json">latest-intl.json</a></li>
+          </ul>
+          HTML
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

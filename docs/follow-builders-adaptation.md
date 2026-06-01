@@ -19,11 +19,16 @@ Current implementation:
 - Daily publish artifacts: `publish/YYYY-MM-DD/digest.md`, `.html`, `.txt`, `wechat-draft.json`
 - Artifacts: `feeds/latest.json` plus dated `feeds/YYYY-MM-DD.json`
 
-Publishing options:
+Publishing options (see `docs/publishing.md` for the operational guide):
 
-- GitHub repo as CDN: commit `feeds/*.json`, consume via raw GitHub URLs.
-- R2/S3: sync `feeds/` after `run_daily.sh`.
+- GitHub Pages: `scripts/publish_feed.py --target git` commits `feeds/`, and
+  `.github/workflows/publish-pages.yml` deploys it to a Pages CDN URL.
+- GitHub raw: same commit, consumed via raw GitHub URLs.
+- R2/S3: `scripts/publish_feed.py --target r2|s3` (locally, or via the
+  `sync-storage` workflow using repo secrets).
 - Private LAN: keep FastAPI running and consume `/api/feed/latest`.
+- CI gate: `.github/workflows/validate-feed.yml` audits, validates the feed
+  schema (`scripts/validate_feed.py`), runs the unit tests, and builds the UI.
 
 The feed deliberately does not run scrapers or LLM calls. It reads current
 SQLite rows plus cached clusters/briefs, which keeps the client path cheap and
@@ -65,9 +70,19 @@ Current implementation:
 A user can hand this repository to an agent and ask it to set up or adjust the
 tool without memorizing launchd, uvicorn, prompt-file, or export commands.
 
+## Implemented Since
+
+- Public feed publication: `scripts/publish_feed.py` (git/Pages + R2/S3) and
+  three GitHub Actions workflows (`validate-feed`, `publish-pages`,
+  `sync-storage`). See `docs/publishing.md`.
+- WeChat Official Account draft adapter: `wechat_adapter.py` +
+  `scripts/publish_wechat_draft.py`. It uploads a cover as a permanent material
+  for the required `thumb_media_id`, then calls `draft/add`. Draft only —
+  publishing stays manual.
+
 ## What Remains Optional
 
-- A separate hosted repo or bucket for public feed publication.
+- A separate hosted repo or bucket dedicated to feed publication.
 - Delivery adapters for Telegram/Discord/email.
-- A WeChat Official Account adapter that turns `publish/latest-wechat-draft.json`
-  into a real draft after media credentials and cover-image flow are configured.
+- WeChat publish/mass-send automation (intentionally out of scope; the adapter
+  stops at a reviewable draft).

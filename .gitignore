@@ -34,6 +34,9 @@ webui/*.tsbuildinfo
 static/index.html
 static/assets/
 
+# GitHub Pages staging dir (assembled by the publish-pages workflow / local test)
+/_site/
+
 # Editorial/delivery drafts generated from cached data.
 # Keep publish/README.md tracked as documentation.
 publish/[0-9][0-9][0-9][0-9]-*/

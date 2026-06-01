@@ -1,0 +1,59 @@
+name: validate-feed
+
+# CI gate. Runs on every push/PR. Needs no secrets: it audits for leaked
+# secrets, compiles the Python sources, validates the exported feed JSON against
+# the public-feed schema, runs the unit tests, and builds the web UI.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Audit for leaked secrets / ignore rules
+        run: python scripts/audit_public_release.py
+      - name: Compile Python sources
+        run: >-
+          python -m compileall -q
+          main.py curated.py public_feed.py publisher.py summarizer.py
+          briefer.py scrape_daily.py wechat_adapter.py
+          scripts/audit_public_release.py scripts/validate_feed.py
+          scripts/publish_feed.py scripts/publish_wechat_draft.py
+      - name: Validate exported feed JSON
+        run: python scripts/validate_feed.py
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test deps
+        run: pip install "httpx==0.27.2"
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+  webui:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: webui
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: webui/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build

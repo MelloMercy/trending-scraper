@@ -12,6 +12,10 @@ Schema:
     schedule_hour           (int)  — hour (0-23) launchd runs the daily scrape.
     schedule_minute         (int)  — minute (0-59).
     enabled_platforms       (list) — subset of supported platforms.
+    wechat_appid            (str)  — optional. WeChat Official Account AppID for
+                                     the draft adapter.
+    wechat_appsecret        (str)  — optional secret. WeChat OA AppSecret. Env
+                                     WECHAT_APPID/WECHAT_APPSECRET override these.
 
 Anything not in the schema is silently ignored on load.
 """
@@ -39,6 +43,8 @@ DEFAULTS: dict[str, Any] = {
     "schedule_hour": 8,
     "schedule_minute": 0,
     "enabled_platforms": list(ALL_PLATFORMS),
+    "wechat_appid": "",
+    "wechat_appsecret": "",
 }
 
 # Field-level descriptions exposed via /api/config — keep in sync with DEFAULTS.
@@ -72,6 +78,16 @@ SCHEMA: dict[str, dict[str, Any]] = {
         "secret": False,
         "items": ALL_PLATFORMS,
         "description": "Platforms enabled for scraping.",
+    },
+    "wechat_appid": {
+        "type": "string",
+        "secret": False,
+        "description": "WeChat Official Account AppID for the draft adapter.",
+    },
+    "wechat_appsecret": {
+        "type": "string",
+        "secret": True,
+        "description": "WeChat Official Account AppSecret (used only by the draft adapter).",
     },
 }
 

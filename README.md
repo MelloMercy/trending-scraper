@@ -16,6 +16,7 @@ trending-scraper/
 ├── curated.py              # 高信号源：follow-builders + 本地 RSS/Podcast
 ├── public_feed.py          # 静态 public feed 构建器（GitHub/R2/S3 友好）
 ├── publisher.py            # 每日精华发布包（公众号/手动投递友好）
+├── wechat_adapter.py       # 公众号草稿适配器（token/封面素材/draft.add）
 ├── similarity.py           # 字符 bigram + Jaccard 相似度
 ├── config.py               # 运行时配置加载器（含 schema）
 ├── config.example.json     # 配置模板（实际配置在 config.json，git 忽略）
@@ -24,6 +25,8 @@ trending-scraper/
 ├── prompts/                # 可对话修改的 LLM prompt markdown 文件
 ├── feeds/                  # `scripts/export_public_feed.py` 生成的静态 JSON
 ├── publish/                # `scripts/export_publish_bundle.py` 生成的每日精华稿
+├── tests/                  # unittest（feed schema / 上传计划 / 公众号适配器）
+├── .github/workflows/      # validate-feed（CI 门禁）+ publish-pages + sync-storage
 ├── SKILL.md                # agent/onboarding 操作入口
 ├── scrapers/
 │   ├── base.py             # Playwright 浏览器上下文（反检测配置）
@@ -230,7 +233,19 @@ curl -s http://localhost:11001/api/feed/latest | jq
 curl -s "http://localhost:11001/api/feed/latest?region=intl" | jq
 ```
 
-发布方式可以是 GitHub raw、R2/S3，或继续由本地 FastAPI 提供 `/api/feed/latest`。
+发布方式可以是 GitHub Pages（推荐，干净的 CDN URL）、GitHub raw、R2/S3，或继续由本地 FastAPI 提供 `/api/feed/latest`。一键发布脚本：
+
+```bash
+# 提交并推送 feeds/（先跑 audit，只暂存 feeds/，再 commit + push）
+.venv/bin/python scripts/publish_feed.py --target git
+# 上传到 R2/S3（先 dry-run 看计划，凭据走环境变量，secret 不进 argv）
+.venv/bin/python scripts/publish_feed.py --target r2 --dry-run
+```
+
+推到 GitHub 后，`.github/workflows/publish-pages.yml` 会校验并把 `feeds/` 发布到
+GitHub Pages（`https://<owner>.github.io/<repo>/latest.json`）；`validate-feed.yml`
+对每次 push/PR 跑 audit + feed schema 校验 + 单元测试 + 前端构建。完整操作见
+[docs/publishing.md](docs/publishing.md)。
 
 ## Publish Bundle（公众号素材准备）
 
@@ -257,6 +272,19 @@ curl -s "http://localhost:11001/api/feed/latest?region=intl" | jq
 ```bash
 curl -s http://localhost:11001/api/publish/latest | jq
 ```
+
+### 接公众号草稿（draft only）
+
+`publish/latest-wechat-draft.json` 可直接喂给公众号草稿适配器。它只建**草稿**，不群发、不发布——你在公众号后台「草稿箱」里审核后再发：
+
+```bash
+# dry-run（默认）：加载草稿、打印计划、列出还差什么
+.venv/bin/python scripts/publish_wechat_draft.py
+# 真正提交：token → 上传封面为永久素材（thumb_media_id）→ draft/add
+.venv/bin/python scripts/publish_wechat_draft.py --cover cover.jpg --submit
+```
+
+凭据走 `config.json` 的 `wechat_appid` / `wechat_appsecret`（后者在 `/api/config` 里遮罩），或环境变量 `WECHAT_APPID` / `WECHAT_APPSECRET`。注意 access_token 需要公众号 IP 白名单。完整步骤与坑见 [docs/publishing.md](docs/publishing.md)。
 
 ## Prompt 文件（对话式调风格）
 
@@ -317,6 +345,8 @@ curl -s "http://localhost:11001/api/brief/today?force=true" | jq
 - [x] ~~中心化 public feed 导出~~ → 已实现 `/api/feed/latest` + `feeds/*.json`
 - [x] ~~每日精华发布包~~ → 已实现 `publish/*.md/html/json` + `/api/publish/latest`
 - [x] ~~Skill 形态入口~~ → 已补 `SKILL.md`
+- [x] ~~feeds 公开发布（GitHub Pages/raw + R2/S3）~~ → `scripts/publish_feed.py` + GitHub Actions（validate-feed / publish-pages / sync-storage）
+- [x] ~~公众号草稿适配器~~ → `wechat_adapter.py` + `scripts/publish_wechat_draft.py`（只建草稿，人工审核后发）
 - [ ] 历史折线趋势图（哪些话题连续多天上榜）
 - [x] ~~在 launchd 抓取后自动预生成话题聚类~~ → `scrape_daily.py` 抓取后会跑 clustering + brief
 - [ ] 加更多平台（微博 / 头条 / 雪球）

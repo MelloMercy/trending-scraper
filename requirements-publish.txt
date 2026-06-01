@@ -1,0 +1,6 @@
+# Optional dependencies for object-storage publication (scripts/publish_feed.py
+# with --target s3 / r2). Not needed for scraping, the web UI, GitHub Pages
+# publication, or the WeChat draft adapter.
+#
+#   pip install -r requirements-publish.txt
+boto3>=1.34,<2

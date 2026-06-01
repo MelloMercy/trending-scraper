@@ -101,6 +101,9 @@ def build_daily_digest(
             "digest": digest[:120],
             "content": html_content,
             "content_source_url": feed_url or "",
+            # Required by WeChat draft/add. Left empty here; the adapter
+            # (scripts/publish_wechat_draft.py) fills it by uploading a cover.
+            "thumb_media_id": "",
             "need_open_comment": 0,
             "only_fans_can_comment": 0,
         },

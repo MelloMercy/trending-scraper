@@ -1,0 +1,49 @@
+name: sync-storage
+
+# Optional: mirror feeds/*.json to an S3-compatible bucket (Cloudflare R2 or AWS
+# S3) whenever the committed feed changes. This keeps bucket credentials in GitHub
+# repo secrets instead of on the local scraping machine.
+#
+# Setup: add these repo secrets (Settings -> Secrets and variables -> Actions).
+# If S3_BUCKET is unset the job no-ops, so this workflow is safe to keep enabled
+# before you have a bucket:
+#   S3_ENDPOINT_URL        (R2: https://<account>.r2.cloudflarestorage.com)
+#   S3_BUCKET
+#   S3_ACCESS_KEY_ID
+#   S3_SECRET_ACCESS_KEY
+#   S3_REGION              (R2: auto)
+#   S3_KEY_PREFIX          (optional, e.g. feeds)
+#   PUBLIC_FEED_BASE_URL   (optional, only used to print result URLs)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "feeds/**"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install boto3
+        run: pip install boto3
+      - name: Sync feeds to object storage
+        env:
+          S3_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT_URL }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          S3_REGION: ${{ secrets.S3_REGION }}
+          S3_KEY_PREFIX: ${{ secrets.S3_KEY_PREFIX }}
+          PUBLIC_FEED_BASE_URL: ${{ secrets.PUBLIC_FEED_BASE_URL }}
+        run: |
+          if [ -z "${S3_BUCKET:-}" ]; then
+            echo "S3_BUCKET secret not set — skipping object-storage sync."
+            exit 0
+          fi
+          python scripts/publish_feed.py --target s3 --all

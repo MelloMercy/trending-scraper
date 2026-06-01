@@ -110,11 +110,24 @@ The follow-builders-style publishing path is:
 
 ```text
 scrape_daily.py -> SQLite/cache -> scripts/export_public_feed.py -> feeds/*.json
+                                -> scripts/publish_feed.py -> GitHub Pages / R2 / S3
 ```
 
-For GitHub raw publication, commit the generated `feeds/*.json` files from a
-publishing machine. For object storage, sync the `feeds/` directory after
-`run_daily.sh`.
+Publish the exported feed with one command (see `docs/publishing.md` for full
+detail and the env-var table):
+
+```bash
+# Commit + push feeds/ (audits first, stages only feeds/). Pairs with the
+# publish-pages GitHub Actions workflow for a GitHub Pages CDN URL.
+.venv/bin/python scripts/publish_feed.py --target git
+
+# Object storage (Cloudflare R2 / AWS S3). Always dry-run first; creds via env.
+.venv/bin/python scripts/publish_feed.py --target r2 --dry-run
+.venv/bin/python scripts/publish_feed.py --target r2
+```
+
+`scripts/validate_feed.py` checks `feeds/latest*.json` against the public-feed
+schema; it is also the CI gate in `.github/workflows/validate-feed.yml`.
 
 ## WeChat / Digest Publishing
 
@@ -125,8 +138,22 @@ cached Daily Brief -> scripts/export_publish_bundle.py -> publish/latest.*
 ```
 
 Use `publish/latest.md` for manual review, `publish/latest.html` for rich-text
-copy/paste workflows, and `publish/latest-wechat-draft.json` as the future input
-to a WeChat draft adapter. Do not add WeChat app secrets to docs or commits.
+copy/paste workflows, and `publish/latest-wechat-draft.json` as input to the
+WeChat draft adapter. Do not add WeChat app secrets to docs or commits.
+
+The adapter (`scripts/publish_wechat_draft.py`) is dry-run by default and only
+creates a **draft** — a human publishes from the WeChat editor:
+
+```bash
+.venv/bin/python scripts/publish_wechat_draft.py                  # dry-run
+.venv/bin/python scripts/publish_wechat_draft.py --cover cover.jpg --submit
+```
+
+Credentials resolve from `config.json` (`wechat_appid` / `wechat_appsecret`,
+the secret masked by `/api/config`) or env `WECHAT_APPID` / `WECHAT_APPSECRET`.
+`draft/add` needs a cover: pass `--cover <image>` (uploaded as a permanent
+material) or `--thumb-media-id <id>`. `access_token` requires the OA's server IP
+whitelist. See `docs/publishing.md`.
 
 ## Guardrails
 
