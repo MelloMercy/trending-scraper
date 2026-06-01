@@ -1,0 +1,25 @@
+{
+  "deepseek_api_key": "",
+  "xhs_cookies_path": "data/xhs_cookies.json",
+  "schedule_hour": 8,
+  "schedule_minute": 0,
+  "enabled_platforms": [
+    "douyin",
+    "xiaohongshu",
+    "bilibili",
+    "zhihu",
+    "kr36",
+    "huxiu",
+    "bbc_world",
+    "hackernews",
+    "theverge",
+    "techcrunch",
+    "nyt_world",
+    "arstechnica",
+    "reuters",
+    "ap_news",
+    "politico",
+    "axios",
+    "semafor"
+  ]
+}

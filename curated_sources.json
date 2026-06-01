@@ -1,0 +1,187 @@
+{
+  "version": 1,
+  "follow_builders": {
+    "enabled": true,
+    "include_x": true,
+    "include_podcasts": true,
+    "include_blogs": true
+  },
+  "limits": {
+    "per_source": 5,
+    "blogs": 48,
+    "podcasts": 24
+  },
+  "sources": [
+    {
+      "id": "openai-news",
+      "name": "OpenAI News",
+      "kind": "blog",
+      "category": "ai-official",
+      "feed_url": "https://openai.com/news/rss.xml",
+      "homepage": "https://openai.com/news/",
+      "tags": ["ai", "official", "models"]
+    },
+    {
+      "id": "google-ai",
+      "name": "Google AI Blog",
+      "kind": "blog",
+      "category": "ai-official",
+      "feed_url": "https://blog.google/technology/ai/rss/",
+      "homepage": "https://blog.google/technology/ai/",
+      "tags": ["ai", "official", "google"]
+    },
+    {
+      "id": "google-gemini",
+      "name": "Google Gemini Blog",
+      "kind": "blog",
+      "category": "ai-official",
+      "feed_url": "https://blog.google/products/gemini/rss/",
+      "homepage": "https://blog.google/products/gemini/",
+      "tags": ["ai", "official", "gemini"]
+    },
+    {
+      "id": "deepmind",
+      "name": "Google DeepMind Blog",
+      "kind": "blog",
+      "category": "ai-research",
+      "feed_url": "https://deepmind.google/blog/rss.xml",
+      "homepage": "https://deepmind.google/blog/",
+      "tags": ["ai", "research", "official"]
+    },
+    {
+      "id": "huggingface",
+      "name": "Hugging Face Blog",
+      "kind": "blog",
+      "category": "ai-builder",
+      "feed_url": "https://huggingface.co/blog/feed.xml",
+      "homepage": "https://huggingface.co/blog",
+      "tags": ["ai", "open-source", "builders"]
+    },
+    {
+      "id": "anthropic-engineering-mirror",
+      "name": "Anthropic Engineering RSS Mirror",
+      "kind": "blog",
+      "category": "ai-official",
+      "feed_url": "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_engineering.xml",
+      "homepage": "https://www.anthropic.com/engineering",
+      "tags": ["ai", "official", "engineering", "mirror"]
+    },
+    {
+      "id": "simon-willison",
+      "name": "Simon Willison",
+      "kind": "blog",
+      "category": "ai-builder",
+      "feed_url": "https://simonwillison.net/atom/everything/",
+      "homepage": "https://simonwillison.net/",
+      "tags": ["ai", "builder", "engineering"]
+    },
+    {
+      "id": "lenny-newsletter",
+      "name": "Lenny's Newsletter",
+      "kind": "blog",
+      "category": "product",
+      "feed_url": "https://www.lennysnewsletter.com/feed",
+      "homepage": "https://www.lennysnewsletter.com/",
+      "tags": ["product", "growth", "startup"]
+    },
+    {
+      "id": "stratechery",
+      "name": "Stratechery",
+      "kind": "blog",
+      "category": "strategy",
+      "feed_url": "https://stratechery.com/feed/",
+      "homepage": "https://stratechery.com/",
+      "tags": ["strategy", "business", "tech"]
+    },
+    {
+      "id": "intercom",
+      "name": "Intercom Blog",
+      "kind": "blog",
+      "category": "product",
+      "feed_url": "https://www.intercom.com/blog/feed/",
+      "homepage": "https://www.intercom.com/blog/",
+      "tags": ["product", "support", "ai"]
+    },
+    {
+      "id": "yc-blog",
+      "name": "Y Combinator Blog",
+      "kind": "blog",
+      "category": "startup",
+      "feed_url": "https://www.ycombinator.com/blog/rss",
+      "homepage": "https://www.ycombinator.com/blog",
+      "tags": ["startup", "founders", "yc"]
+    },
+    {
+      "id": "elad-gil",
+      "name": "Elad Gil",
+      "kind": "blog",
+      "category": "startup",
+      "feed_url": "https://blog.eladgil.com/feed",
+      "homepage": "https://blog.eladgil.com/",
+      "tags": ["startup", "investing", "ai"]
+    },
+    {
+      "id": "andrew-chen",
+      "name": "Andrew Chen",
+      "kind": "blog",
+      "category": "growth",
+      "feed_url": "https://andrewchen.com/feed/",
+      "homepage": "https://andrewchen.com/",
+      "tags": ["growth", "startup", "product"]
+    },
+    {
+      "id": "latent-space",
+      "name": "Latent Space",
+      "kind": "podcast",
+      "category": "ai-podcast",
+      "feed_url": "https://pod2txt.vercel.app/api/feed?url=https://api.substack.com/feed/podcast/1084089.rss",
+      "homepage": "https://www.latent.space/",
+      "tags": ["ai", "podcast", "builders"]
+    },
+    {
+      "id": "training-data",
+      "name": "Training Data",
+      "kind": "podcast",
+      "category": "ai-podcast",
+      "feed_url": "https://feeds.megaphone.fm/trainingdata",
+      "homepage": "https://www.sequoiacap.com/podcast/training-data/",
+      "tags": ["ai", "podcast", "builders"]
+    },
+    {
+      "id": "no-priors",
+      "name": "No Priors",
+      "kind": "podcast",
+      "category": "ai-podcast",
+      "feed_url": "https://feeds.megaphone.fm/nopriors",
+      "homepage": "https://www.nopriors.com/",
+      "tags": ["ai", "podcast", "startup"]
+    },
+    {
+      "id": "unsupervised-learning",
+      "name": "Unsupervised Learning",
+      "kind": "podcast",
+      "category": "ai-podcast",
+      "feed_url": "https://feeds.simplecast.com/dOSE_bdP",
+      "homepage": "https://www.redpoint.com/podcasts/unsupervised-learning/",
+      "tags": ["ai", "podcast", "frontier"]
+    },
+    {
+      "id": "mad-podcast",
+      "name": "The MAD Podcast",
+      "kind": "podcast",
+      "category": "ai-podcast",
+      "feed_url": "https://anchor.fm/s/f2ee4948/podcast/rss",
+      "homepage": "https://www.madturck.com/podcast",
+      "tags": ["ai", "podcast", "data"]
+    },
+    {
+      "id": "ai-and-i",
+      "name": "AI & I by Every",
+      "kind": "podcast",
+      "category": "ai-podcast",
+      "feed_url": "https://anchor.fm/s/ed1f5584/podcast/rss",
+      "homepage": "https://every.to/ai-and-i",
+      "tags": ["ai", "podcast", "operators"]
+    }
+  ]
+}
