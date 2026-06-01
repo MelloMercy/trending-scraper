@@ -4,6 +4,18 @@
 
 前端：React 18 + TypeScript + Tailwind + shadcn/ui，源码在 `webui/`，build 后输出到 `static/`。详见 [webui/README.md](webui/README.md)。
 
+## 功能一览
+
+- **17 个热点源**：国内 6（抖音 / 小红书 / B 站 / 知乎 / 36 氪 / 虎嗅）+ 国际 11（BBC World / Hacker News / The Verge / TechCrunch / NYT World / Ars Technica / Reuters / AP News / Politico / Axios / Semafor）。
+- **跨平台共识**：规则法找出出现在最多平台的「今日大故事」，并给标题级共识徽章。
+- **LLM 话题聚类 + Daily Brief**：DeepSeek 把标题聚成 5–10 个话题，再做跨地区每日简报（可选，配 key 启用；prompt 抽到 `prompts/*.md`，可对话式修改）。
+- **高信号源**：follow-builders 的 X / 播客 / 博客 + 本地 `curated_sources.json` 的 RSS / newsletter。
+- **Public Feed**：导出 `feeds/*.json` 静态快照，可发布到 GitHub Pages / raw / R2 / S3，客户端免装 Playwright、免配 cookies。
+- **公众号发布链路**：每日精华导出 Markdown / HTML / 纯文本 + 公众号草稿 payload；草稿适配器把它推成公众号「草稿」（人工审核后再发）。
+- **前端**：网格 / 时间流视图、历史日期回看、Prompt 在线编辑。
+- **自动化**：macOS launchd 每日定时「抓取 → 聚类 → 简报 → 导出」；GitHub Actions 做 CI 门禁与 Pages 发布。
+- **隐私边界**：密钥 / cookies / 本地数据全部 gitignore，附 `scripts/audit_public_release.py` 发布前扫描。
+
 ## 架构
 
 ```
@@ -27,6 +39,15 @@ trending-scraper/
 ├── publish/                # `scripts/export_publish_bundle.py` 生成的每日精华稿
 ├── tests/                  # unittest（feed schema / 上传计划 / 公众号适配器）
 ├── .github/workflows/      # validate-feed（CI 门禁）+ publish-pages + sync-storage
+├── scripts/                # 启动 / 导出 / 发布 / 审计脚本
+│   ├── start.sh            # 一键启动 web 服务（:11001）
+│   ├── export_public_feed.py     # 导出 feeds/*.json
+│   ├── export_publish_bundle.py  # 导出 publish/ 每日精华
+│   ├── publish_feed.py     # 发布 feeds → git(Pages/raw) / R2 / S3
+│   ├── publish_wechat_draft.py   # 把草稿 payload 推成公众号草稿
+│   ├── validate_feed.py    # public feed schema 校验（CI 复用）
+│   └── audit_public_release.py   # 公开发布前密钥扫描
+├── docs/                   # publishing / 发布清单 / follow-builders 适配说明
 ├── SKILL.md                # agent/onboarding 操作入口
 ├── scrapers/
 │   ├── base.py             # Playwright 浏览器上下文（反检测配置）
@@ -40,8 +61,9 @@ trending-scraper/
 ├── static/index.html       # 单页前端
 ├── launchd/
 │   └── com.local.trending-scraper.plist   # macOS launchd 定时配置
-├── data/                   # SQLite 库、cookies、日志
-└── requirements.txt
+├── data/                   # SQLite 库、cookies、日志、wechat_token.json
+├── requirements.txt          # 运行依赖
+└── requirements-publish.txt  # 可选：boto3（仅 R2/S3 上传需要）
 ```
 
 ## 快速开始
@@ -70,6 +92,8 @@ bash "/Users/mercy/projects/auto scripts/trending-scraper/scripts/start.sh"
 # dev 热重载
 RELOAD=1 bash "/Users/mercy/projects/auto scripts/trending-scraper/scripts/start.sh"
 ```
+
+> 依赖：运行只需 `requirements.txt`。只有要用 `scripts/publish_feed.py` 上传到 R2/S3 时，才额外 `pip install -r requirements-publish.txt`（boto3）。前端构建需要 Node 20+。
 
 ## 平台一览
 
@@ -135,8 +159,27 @@ curl -X POST -H "Content-Type: application/json" \
 | `schedule_hour` | int 0-23 | 8 | （未来）UI 设置定时小时 |
 | `schedule_minute` | int 0-59 | 0 | （未来）UI 设置定时分钟 |
 | `enabled_platforms` | array | 全部 17 个 | （未来）UI 开关单个平台 |
+| `wechat_appid` | string | "" | 公众号 AppID（草稿适配器用） |
+| `wechat_appsecret` | string (secret) | "" | 公众号 AppSecret（`/api/config` 里遮罩） |
 
 > 当前 `schedule_hour/minute` 只是配置位，**不会**自动改 launchd plist——改时间还是要手动改 plist 文件。把它放在 schema 里是为以后做「web 端改定时」做准备。
+>
+> `wechat_*` 存在 `config.json`（gitignore），也可被环境变量 `WECHAT_APPID` / `WECHAT_APPSECRET` 覆盖。详见[环境变量](#环境变量)。
+
+## 环境变量
+
+除 `config.json` 外，少量行为可由环境变量控制（CI / 一次性运行友好）：
+
+| 变量 | 用途 | 默认 / 示例 |
+|------|------|------------|
+| `PORT` | `scripts/start.sh` 监听端口 | `11001` |
+| `RELOAD` | `start.sh` 开 uvicorn `--reload` | `0` |
+| `DEEPSEEK_MODEL` | 覆盖聚类/简报模型 | `deepseek-v4-flash`（可设 `deepseek-v4-pro`） |
+| `WECHAT_APPID` / `WECHAT_APPSECRET` | 公众号凭据（覆盖 `config.json`） | — |
+| `S3_ENDPOINT_URL` / `S3_BUCKET` / `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` / `S3_REGION` / `S3_KEY_PREFIX` | `publish_feed.py` 上传到 R2/S3（`R2_*` / `AWS_*` 别名也认） | R2 region 用 `auto` |
+| `PUBLIC_FEED_BASE_URL` | 上传后打印结果 URL 用 | `https://cdn.example.com` |
+
+> secret 类变量（AppSecret、S3 secret key）只从环境/`config.json`/仓库 secret 读取，**绝不写进代码或 commit**；`publish_feed.py` 的 secret key 只走环境变量、不进命令行参数。完整对接见 [docs/publishing.md](docs/publishing.md)。
 
 ## 公开发布前检查
 
@@ -286,6 +329,26 @@ curl -s http://localhost:11001/api/publish/latest | jq
 
 凭据走 `config.json` 的 `wechat_appid` / `wechat_appsecret`（后者在 `/api/config` 里遮罩），或环境变量 `WECHAT_APPID` / `WECHAT_APPSECRET`。注意 access_token 需要公众号 IP 白名单。完整步骤与坑见 [docs/publishing.md](docs/publishing.md)。
 
+## 测试
+
+纯 stdlib + httpx 的单元测试（无网络、不导入 scraper / Playwright），覆盖 feed schema 校验、上传计划与配置解析、公众号适配器（token 缓存、草稿组装、API 错误处理）：
+
+```bash
+.venv/bin/python -m unittest discover -s tests
+```
+
+公众号网络调用用 `httpx.MockTransport` 打桩；37 个用例。CI 里也会跑（见下）。
+
+## 持续集成与 GitHub Actions
+
+仓库带三个工作流（`.github/workflows/`）：
+
+- **`validate-feed`** — 每次 push / PR 的门禁，无需 secret：`audit_public_release.py` 扫密钥 → `compileall` → `validate_feed.py` 校验 feed schema → `unittest` → `webui` 的 `npm ci && lint && build`。
+- **`publish-pages`** — 当 `feeds/**` 变动（`feeds/README.md` 除外）时，把 `feeds/` 部署到 GitHub Pages，得到 `https://mellomercy.github.io/trending-scraper/latest.json`。`configure-pages` 设了 `enablement: true`，首次运行会自动开启 Pages（若 token 权限不足，到仓库 Settings → Pages 手动开一次即可）。
+- **`sync-storage`** — 可选：`feeds/**` 变动时把 feeds 同步到 R2/S3，凭据走仓库 secret（`S3_*`）；未设 `S3_BUCKET` 时自动空跑，可安全保留。
+
+本地对应的发布命令见上方 Public Feed 一节与 [docs/publishing.md](docs/publishing.md)。
+
 ## Prompt 文件（对话式调风格）
 
 LLM prompt 已从 Python 里抽到 markdown 文件：
@@ -350,3 +413,11 @@ curl -s "http://localhost:11001/api/brief/today?force=true" | jq
 - [ ] 历史折线趋势图（哪些话题连续多天上榜）
 - [x] ~~在 launchd 抓取后自动预生成话题聚类~~ → `scrape_daily.py` 抓取后会跑 clustering + brief
 - [ ] 加更多平台（微博 / 头条 / 雪球）
+
+## 声明与合理使用
+
+- 本项目是**个人自用**的学习 / 信息聚合工具，抓的是各平台**公开**的热点榜单与页面。
+- 请控制频率、尊重各平台 robots 与服务条款；默认每天一次，不要拿它做高频或商业化抓取。
+- 抓取内容版权归原平台 / 作者；二次发布（public feed、公众号）请保留来源链接并自行承担合规责任。
+- 不抓取、不存储任何登录用户的私人数据；小红书 cookies 仅用于读取你自己账号可见的热搜榜，存于本机 `data/`（已 gitignore）。
+- 暂无开源 LICENSE：在他人复用前，请先决定并补一个许可证文件。
