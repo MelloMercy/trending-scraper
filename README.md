@@ -10,7 +10,7 @@
 - **跨平台共识**：规则法找出出现在最多平台的「今日大故事」，并给标题级共识徽章。
 - **LLM 话题聚类 + Daily Brief**：DeepSeek 把标题聚成 5–10 个话题，再做跨地区每日简报（可选，配 key 启用；prompt 抽到 `prompts/*.md`，可对话式修改）。
 - **高信号源**：follow-builders 的 X / 播客 / 博客 + 本地 `curated_sources.json` 的 RSS / newsletter。
-- **Public Feed**：导出 `feeds/*.json` 静态快照，可发布到 GitHub Pages / raw / R2 / S3，客户端免装 Playwright、免配 cookies。
+- **Public Feed**：导出 `feeds/*.json` 静态快照 + RSS（`latest.xml`）+ 零依赖静态前端（`index.html`）做在线 demo，可发布到 GitHub Pages / raw / R2 / S3，客户端免装 Playwright、免配 cookies。
 - **公众号发布链路**：每日精华导出 Markdown / HTML / 纯文本 + 公众号草稿 payload；草稿适配器把它推成公众号「草稿」（人工审核后再发）。
 - **前端**：网格 / 时间流视图、历史日期回看、Prompt 在线编辑。
 - **自动化**：macOS launchd 每日定时「抓取 → 聚类 → 简报 → 导出」；GitHub Actions 做 CI 门禁与 Pages 发布。
@@ -265,10 +265,12 @@ curl -s http://localhost:11001/api/curated/latest | jq
 
 输出：
 
-- `feeds/latest.json`
-- `feeds/YYYY-MM-DD.json`
+- `feeds/latest.json` / `feeds/YYYY-MM-DD.json`（另有 `latest-cn/-intl.json` 分区）
+- `feeds/latest.xml` / `feeds/YYYY-MM-DD.xml`：RSS 2.0，可被任意阅读器订阅（有缓存简报时按话题成条，否则取各平台 top 条目）
+- `feeds/index.html`：零依赖静态前端，直接读 `latest.json` 渲染，作为 Pages 首页 / 在线 demo
 
 不传 `--date` 时会使用最新有数据的快照，避免跨日但新抓取还没跑时生成空 feed。
+可选 `--base-url` 把公开域名写进 RSS 频道链接。
 运行 `scrape_daily.py` 时会在成功抓取后自动导出 public feed。客户端也可以直接读：
 
 ```bash
@@ -286,7 +288,8 @@ curl -s "http://localhost:11001/api/feed/latest?region=intl" | jq
 ```
 
 推到 GitHub 后，`.github/workflows/publish-pages.yml` 会校验并把 `feeds/` 发布到
-GitHub Pages（`https://<owner>.github.io/<repo>/latest.json`）；`validate-feed.yml`
+GitHub Pages：首页 `https://mellomercy.github.io/trending-scraper/` 即在线 demo（读
+`latest.json` 渲染），数据在 `/latest.json`、RSS 在 `/latest.xml`；`validate-feed.yml`
 对每次 push/PR 跑 audit + feed schema 校验 + 单元测试 + 前端构建。完整操作见
 [docs/publishing.md](docs/publishing.md)。
 
@@ -420,4 +423,4 @@ curl -s "http://localhost:11001/api/brief/today?force=true" | jq
 - 请控制频率、尊重各平台 robots 与服务条款；默认每天一次，不要拿它做高频或商业化抓取。
 - 抓取内容版权归原平台 / 作者；二次发布（public feed、公众号）请保留来源链接并自行承担合规责任。
 - 不抓取、不存储任何登录用户的私人数据；小红书 cookies 仅用于读取你自己账号可见的热搜榜，存于本机 `data/`（已 gitignore）。
-- 暂无开源 LICENSE：在他人复用前，请先决定并补一个许可证文件。
+- 本项目以 **MIT** 许可证开源，见 [LICENSE](LICENSE)。

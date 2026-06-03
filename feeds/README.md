@@ -5,6 +5,8 @@
 - `latest.json` - latest all-region feed.
 - `YYYY-MM-DD.json` - immutable daily snapshot.
 - `latest-cn.json` / `latest-intl.json` - optional region-only exports.
+- `latest.xml` / `YYYY-MM-DD.xml` - RSS 2.0 digest of the same snapshot.
+- `index.html` - zero-dependency static UI that reads `latest.json`; served as the GitHub Pages homepage.
 
 These files are intentionally static. A publishing machine can run the full
 scraper, commit or upload this directory, and lightweight clients can consume

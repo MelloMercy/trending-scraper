@@ -47,18 +47,8 @@ jobs:
           rm -rf _site
           mkdir -p _site
           cp feeds/*.json _site/
-          snap="$(python -c "import json;print(json.load(open('feeds/latest.json'))['snapshot_date'])")"
-          cat > _site/index.html <<HTML
-          <!doctype html><meta charset="utf-8">
-          <title>trending-scraper public feed</title>
-          <h1>Public feed</h1>
-          <p>Latest snapshot: <strong>${snap}</strong></p>
-          <ul>
-            <li><a href="latest.json">latest.json</a> (all regions)</li>
-            <li><a href="latest-cn.json">latest-cn.json</a></li>
-            <li><a href="latest-intl.json">latest-intl.json</a></li>
-          </ul>
-          HTML
+          cp feeds/*.xml _site/ 2>/dev/null || true
+          cp feeds/index.html _site/        # static read-only UI that reads ./latest.json
       - uses: actions/configure-pages@v5
         with:
           # Auto-enable Pages (build_type: workflow) on first run, so no manual

@@ -19,6 +19,7 @@ def main() -> int:
     parser.add_argument("--date", dest="snapshot_date", help="Snapshot date, e.g. 2026-05-31")
     parser.add_argument("--region", choices=["cn", "intl"], help="Export only one region")
     parser.add_argument("--out", default=str(public_feed.DEFAULT_FEED_DIR), help="Output directory")
+    parser.add_argument("--base-url", help="Public base URL stamped into the RSS channel link")
     args = parser.parse_args()
 
     result = public_feed.write_public_feed(
@@ -27,10 +28,11 @@ def main() -> int:
         out_dir=args.out,
         snapshot_date=args.snapshot_date,
         region=args.region,
+        base_url=args.base_url,
     )
-    print(f"snapshot_date={result['snapshot_date']}")
-    print(f"dated={result['dated']}")
-    print(f"latest={result['latest']}")
+    for key in ("snapshot_date", "dated", "latest", "rss_latest", "rss_dated"):
+        if key in result:
+            print(f"{key}={result[key]}")
     return 0
 
 
