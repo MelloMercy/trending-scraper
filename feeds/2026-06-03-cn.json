@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-04T01:22:19",
+  "generated_at": "2026-06-04T01:39:58",
   "snapshot_date": "2026-06-03",
   "region": "cn",
   "summary": {
@@ -7318,6 +7318,63 @@
         "error": null
       }
     }
+  },
+  "trends": {
+    "schema_version": 1,
+    "window": [
+      "2026-05-28",
+      "2026-05-29",
+      "2026-05-30",
+      "2026-05-31",
+      "2026-06-01",
+      "2026-06-02",
+      "2026-06-03"
+    ],
+    "days_back": 7,
+    "min_days": 2,
+    "min_platforms": 2,
+    "pool_size": 1082,
+    "count": 1,
+    "trends": [
+      {
+        "title": "如何看待哈佛最年轻华人正教授尹希，爆出入职open AI？",
+        "url": "https://www.zhihu.com/question/2044397085965955829",
+        "platforms": [
+          "kr36",
+          "zhihu"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-06-01",
+          "2026-06-02"
+        ],
+        "day_count": 2,
+        "streak": 2,
+        "first_seen": "2026-06-01",
+        "last_seen": "2026-06-02",
+        "peak_rank": 5,
+        "trajectory": "steady",
+        "score": 446,
+        "timeline": [
+          {
+            "date": "2026-06-01",
+            "platforms": [
+              "zhihu"
+            ],
+            "best_rank": 5,
+            "count": 1
+          },
+          {
+            "date": "2026-06-02",
+            "platforms": [
+              "kr36"
+            ],
+            "best_rank": 9,
+            "count": 1
+          }
+        ]
+      }
+    ]
   },
   "brief": null
 }

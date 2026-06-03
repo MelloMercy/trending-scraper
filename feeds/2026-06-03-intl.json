@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-04T01:22:19",
+  "generated_at": "2026-06-04T01:39:58",
   "snapshot_date": "2026-06-03",
   "region": "intl",
   "summary": {
@@ -11864,6 +11864,640 @@
         "error": null
       }
     }
+  },
+  "trends": {
+    "schema_version": 1,
+    "window": [
+      "2026-05-28",
+      "2026-05-29",
+      "2026-05-30",
+      "2026-05-31",
+      "2026-06-01",
+      "2026-06-02",
+      "2026-06-03"
+    ],
+    "days_back": 7,
+    "min_days": 2,
+    "min_platforms": 2,
+    "pool_size": 2022,
+    "count": 12,
+    "trends": [
+      {
+        "title": "Trump administration drops $1.8 billion 'weaponization' fund after Republican backlash",
+        "url": "https://news.google.com/rss/articles/CBMiyAFBVV95cUxOMC1iN2ZnOXMwRHVjRlphMC13akFIY3dfaU5VNHZyQlpQVnN4ajlEdmx2bHdxdDBCVUNvMzBSMzNSblg2aGczRFpKXzlleFFSYWh2ejU5RVEzV0VXbVp4M1IxdG5haUhPRGNTMUZKdWRyR2RzUWt5dVdEdUM5REplejFPZU02cU9UdkY5QXlWdXdDMElkTU5qdGZqY2JtVTF3LUx0bVJKVmVSR05sZ3g1SDQ1WE5aMW1NM09CZWFxZVZ0Y2pBd0NGQg?oc=5",
+        "platforms": [
+          "ap_news",
+          "axios",
+          "bbc_world",
+          "reuters"
+        ],
+        "platform_count": 4,
+        "days": [
+          "2026-05-30",
+          "2026-05-31",
+          "2026-06-01",
+          "2026-06-02",
+          "2026-06-03"
+        ],
+        "day_count": 5,
+        "streak": 5,
+        "first_seen": "2026-05-30",
+        "last_seen": "2026-06-03",
+        "peak_rank": 2,
+        "trajectory": "rising",
+        "score": 990,
+        "timeline": [
+          {
+            "date": "2026-05-30",
+            "platforms": [
+              "axios",
+              "reuters"
+            ],
+            "best_rank": 6,
+            "count": 2
+          },
+          {
+            "date": "2026-05-31",
+            "platforms": [
+              "ap_news",
+              "axios"
+            ],
+            "best_rank": 10,
+            "count": 2
+          },
+          {
+            "date": "2026-06-01",
+            "platforms": [
+              "ap_news",
+              "axios"
+            ],
+            "best_rank": 13,
+            "count": 2
+          },
+          {
+            "date": "2026-06-02",
+            "platforms": [
+              "axios"
+            ],
+            "best_rank": 29,
+            "count": 1
+          },
+          {
+            "date": "2026-06-03",
+            "platforms": [
+              "ap_news",
+              "bbc_world",
+              "reuters"
+            ],
+            "best_rank": 2,
+            "count": 3
+          }
+        ]
+      },
+      {
+        "title": "Gretchen Whitmer says she won’t run for president in 2028",
+        "url": "https://www.politico.com/news/2026/05/28/gretchen-whitmer-2028-president-00940998",
+        "platforms": [
+          "ap_news",
+          "politico"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-05-29",
+          "2026-05-30",
+          "2026-05-31",
+          "2026-06-01",
+          "2026-06-02",
+          "2026-06-03"
+        ],
+        "day_count": 6,
+        "streak": 6,
+        "first_seen": "2026-05-29",
+        "last_seen": "2026-06-03",
+        "peak_rank": 3,
+        "trajectory": "falling",
+        "score": 923,
+        "timeline": [
+          {
+            "date": "2026-05-29",
+            "platforms": [
+              "politico"
+            ],
+            "best_rank": 3,
+            "count": 1
+          },
+          {
+            "date": "2026-05-30",
+            "platforms": [
+              "politico"
+            ],
+            "best_rank": 8,
+            "count": 1
+          },
+          {
+            "date": "2026-05-31",
+            "platforms": [
+              "ap_news",
+              "politico"
+            ],
+            "best_rank": 10,
+            "count": 2
+          },
+          {
+            "date": "2026-06-01",
+            "platforms": [
+              "ap_news",
+              "politico"
+            ],
+            "best_rank": 10,
+            "count": 2
+          },
+          {
+            "date": "2026-06-02",
+            "platforms": [
+              "politico"
+            ],
+            "best_rank": 12,
+            "count": 1
+          },
+          {
+            "date": "2026-06-03",
+            "platforms": [
+              "politico"
+            ],
+            "best_rank": 14,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "title": "Performers keep dropping out of the Trump-linked Freedom 250 concert series",
+        "url": "https://www.axios.com/2026/05/29/trump-freedom-250-lineup-artists-drop-out",
+        "platforms": [
+          "ap_news",
+          "axios",
+          "bbc_world"
+        ],
+        "platform_count": 3,
+        "days": [
+          "2026-05-30",
+          "2026-05-31",
+          "2026-06-01",
+          "2026-06-02"
+        ],
+        "day_count": 4,
+        "streak": 4,
+        "first_seen": "2026-05-30",
+        "last_seen": "2026-06-02",
+        "peak_rank": 3,
+        "trajectory": "steady",
+        "score": 780,
+        "timeline": [
+          {
+            "date": "2026-05-30",
+            "platforms": [
+              "axios"
+            ],
+            "best_rank": 3,
+            "count": 1
+          },
+          {
+            "date": "2026-05-31",
+            "platforms": [
+              "axios",
+              "bbc_world"
+            ],
+            "best_rank": 7,
+            "count": 2
+          },
+          {
+            "date": "2026-06-01",
+            "platforms": [
+              "ap_news",
+              "axios",
+              "bbc_world"
+            ],
+            "best_rank": 11,
+            "count": 4
+          },
+          {
+            "date": "2026-06-02",
+            "platforms": [
+              "ap_news",
+              "axios",
+              "bbc_world"
+            ],
+            "best_rank": 19,
+            "count": 3
+          }
+        ]
+      },
+      {
+        "title": "First of five men found alive in flooded Laos cave rescued",
+        "url": "https://www.bbc.com/news/articles/cvgzxjrkvn8o?at_medium=RSS&at_campaign=rss",
+        "platforms": [
+          "bbc_world",
+          "nyt_world"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-05-28",
+          "2026-05-29",
+          "2026-05-30"
+        ],
+        "day_count": 3,
+        "streak": 3,
+        "first_seen": "2026-05-28",
+        "last_seen": "2026-05-30",
+        "peak_rank": 4,
+        "trajectory": "steady",
+        "score": 561,
+        "timeline": [
+          {
+            "date": "2026-05-28",
+            "platforms": [
+              "bbc_world",
+              "nyt_world"
+            ],
+            "best_rank": 6,
+            "count": 2
+          },
+          {
+            "date": "2026-05-29",
+            "platforms": [
+              "bbc_world"
+            ],
+            "best_rank": 19,
+            "count": 1
+          },
+          {
+            "date": "2026-05-30",
+            "platforms": [
+              "bbc_world"
+            ],
+            "best_rank": 4,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "title": "YouTube to automatically label AI-generated videos",
+        "url": "https://blog.youtube/news-and-events/improving-ai-labels-viewers-creators/",
+        "platforms": [
+          "arstechnica",
+          "hackernews",
+          "techcrunch"
+        ],
+        "platform_count": 3,
+        "days": [
+          "2026-05-28",
+          "2026-05-29"
+        ],
+        "day_count": 2,
+        "streak": 2,
+        "first_seen": "2026-05-28",
+        "last_seen": "2026-05-29",
+        "peak_rank": 1,
+        "trajectory": "falling",
+        "score": 554,
+        "timeline": [
+          {
+            "date": "2026-05-28",
+            "platforms": [
+              "arstechnica",
+              "hackernews",
+              "techcrunch"
+            ],
+            "best_rank": 5,
+            "count": 3
+          },
+          {
+            "date": "2026-05-29",
+            "platforms": [
+              "hackernews"
+            ],
+            "best_rank": 1,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "title": "Trump to headline 250th anniversary fair opening after performers drop out",
+        "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxNb29JNkhQQWpJd1JGV2hqdG1fcTNuZUExcnkzUmhSMXFVdm1fRUdleUNHQ3l2NGNWZ1poQXZJYlRTU25EdUx0Z2piQ2c1OXltRW5kZm50YUdwUXZaZG9JWHp4ejNKRXZWVWFjSkhtc2pwZThoR0ZuQ2t1OFJUSFprVFZsVEE5akVaM0hxcXpSRlRmWGlNWnhKMHB1TF9VaU92NjlvZS1lLUNmbjVrTWxkZ3Zn?oc=5",
+        "platforms": [
+          "ap_news",
+          "reuters"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-05-31",
+          "2026-06-02",
+          "2026-06-03"
+        ],
+        "day_count": 3,
+        "streak": 2,
+        "first_seen": "2026-05-31",
+        "last_seen": "2026-06-03",
+        "peak_rank": 4,
+        "trajectory": "falling",
+        "score": 534,
+        "timeline": [
+          {
+            "date": "2026-05-31",
+            "platforms": [
+              "reuters"
+            ],
+            "best_rank": 4,
+            "count": 1
+          },
+          {
+            "date": "2026-06-02",
+            "platforms": [
+              "ap_news"
+            ],
+            "best_rank": 17,
+            "count": 1
+          },
+          {
+            "date": "2026-06-03",
+            "platforms": [
+              "ap_news"
+            ],
+            "best_rank": 15,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "title": "Websites have a new way to spy on visitors: analyzing their SSD activity",
+        "url": "https://arstechnica.com/security/2026/05/websites-have-a-new-way-to-spy-on-visitors-analyzing-their-ssd-activity/",
+        "platforms": [
+          "arstechnica",
+          "hackernews"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-05-28",
+          "2026-05-29",
+          "2026-06-01"
+        ],
+        "day_count": 3,
+        "streak": 2,
+        "first_seen": "2026-05-28",
+        "last_seen": "2026-06-01",
+        "peak_rank": 2,
+        "trajectory": "falling",
+        "score": 534,
+        "timeline": [
+          {
+            "date": "2026-05-28",
+            "platforms": [
+              "arstechnica"
+            ],
+            "best_rank": 2,
+            "count": 1
+          },
+          {
+            "date": "2026-05-29",
+            "platforms": [
+              "arstechnica"
+            ],
+            "best_rank": 17,
+            "count": 1
+          },
+          {
+            "date": "2026-06-01",
+            "platforms": [
+              "hackernews"
+            ],
+            "best_rank": 17,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "title": "Scoop: U.S. and Iran reach deal but need Trump's final approval, officials say",
+        "url": "https://www.axios.com/2026/05/28/iran-peace-deal-trump-approval",
+        "platforms": [
+          "axios",
+          "reuters"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-05-29",
+          "2026-05-30",
+          "2026-05-31"
+        ],
+        "day_count": 3,
+        "streak": 3,
+        "first_seen": "2026-05-29",
+        "last_seen": "2026-05-31",
+        "peak_rank": 8,
+        "trajectory": "falling",
+        "score": 530,
+        "timeline": [
+          {
+            "date": "2026-05-29",
+            "platforms": [
+              "axios",
+              "reuters"
+            ],
+            "best_rank": 8,
+            "count": 2
+          },
+          {
+            "date": "2026-05-30",
+            "platforms": [
+              "axios"
+            ],
+            "best_rank": 24,
+            "count": 1
+          },
+          {
+            "date": "2026-05-31",
+            "platforms": [
+              "axios"
+            ],
+            "best_rank": 28,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "title": "No breakthrough in US-Iran talks",
+        "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxNd2RTbmNWVGFXb3R5NF9WWGluS2RnLURMQ2FqelpuLXl4UjVBTWxGS2JxaS1Mb2gyWllocVJNNXdMWVJrYnMzRm1EYWM0MVBQUnNxREctSlNJMUtPbDctUWsyS1N1QlVzZ0k5Q1Q3WjFxU2h5cldkeXNvMU1zZ3ZmSw?oc=5",
+        "platforms": [
+          "bbc_world",
+          "semafor"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-05-29",
+          "2026-06-02",
+          "2026-06-03"
+        ],
+        "day_count": 3,
+        "streak": 2,
+        "first_seen": "2026-05-29",
+        "last_seen": "2026-06-03",
+        "peak_rank": 5,
+        "trajectory": "steady",
+        "score": 527,
+        "timeline": [
+          {
+            "date": "2026-05-29",
+            "platforms": [
+              "bbc_world"
+            ],
+            "best_rank": 21,
+            "count": 1
+          },
+          {
+            "date": "2026-06-02",
+            "platforms": [
+              "semafor"
+            ],
+            "best_rank": 5,
+            "count": 1
+          },
+          {
+            "date": "2026-06-03",
+            "platforms": [
+              "semafor"
+            ],
+            "best_rank": 17,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "title": "U.N. Adds Israeli and Russian Forces to Sexual Violence List",
+        "url": "https://www.nytimes.com/2026/05/29/world/middleeast/israel-russia-un-sexual-violence.html",
+        "platforms": [
+          "ap_news",
+          "nyt_world"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-05-30",
+          "2026-05-31",
+          "2026-06-01"
+        ],
+        "day_count": 3,
+        "streak": 3,
+        "first_seen": "2026-05-30",
+        "last_seen": "2026-06-01",
+        "peak_rank": 18,
+        "trajectory": "falling",
+        "score": 521,
+        "timeline": [
+          {
+            "date": "2026-05-30",
+            "platforms": [
+              "ap_news",
+              "nyt_world"
+            ],
+            "best_rank": 18,
+            "count": 2
+          },
+          {
+            "date": "2026-05-31",
+            "platforms": [
+              "ap_news",
+              "nyt_world"
+            ],
+            "best_rank": 24,
+            "count": 2
+          },
+          {
+            "date": "2026-06-01",
+            "platforms": [
+              "ap_news"
+            ],
+            "best_rank": 27,
+            "count": 1
+          }
+        ]
+      },
+      {
+        "title": "Huge blast kills dozens in rebel-held village in Myanmar",
+        "url": "https://www.bbc.com/news/articles/cglp7p787njo?at_medium=RSS&at_campaign=rss",
+        "platforms": [
+          "bbc_world",
+          "nyt_world"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-06-01",
+          "2026-06-02"
+        ],
+        "day_count": 2,
+        "streak": 2,
+        "first_seen": "2026-06-01",
+        "last_seen": "2026-06-02",
+        "peak_rank": 4,
+        "trajectory": "steady",
+        "score": 446,
+        "timeline": [
+          {
+            "date": "2026-06-01",
+            "platforms": [
+              "bbc_world"
+            ],
+            "best_rank": 4,
+            "count": 1
+          },
+          {
+            "date": "2026-06-02",
+            "platforms": [
+              "bbc_world",
+              "nyt_world"
+            ],
+            "best_rank": 10,
+            "count": 2
+          }
+        ]
+      },
+      {
+        "title": "Jill Biden says she thought husband was 'having a stroke' during 2024 debate",
+        "url": "https://www.bbc.com/news/articles/c99l270vy3no?at_medium=RSS&at_campaign=rss",
+        "platforms": [
+          "ap_news",
+          "bbc_world"
+        ],
+        "platform_count": 2,
+        "days": [
+          "2026-05-28",
+          "2026-05-29"
+        ],
+        "day_count": 2,
+        "streak": 2,
+        "first_seen": "2026-05-28",
+        "last_seen": "2026-05-29",
+        "peak_rank": 3,
+        "trajectory": "steady",
+        "score": 446,
+        "timeline": [
+          {
+            "date": "2026-05-28",
+            "platforms": [
+              "bbc_world"
+            ],
+            "best_rank": 3,
+            "count": 1
+          },
+          {
+            "date": "2026-05-29",
+            "platforms": [
+              "ap_news",
+              "bbc_world"
+            ],
+            "best_rank": 11,
+            "count": 2
+          }
+        ]
+      }
+    ]
   },
   "brief": null
 }
