@@ -22,6 +22,7 @@ import db
 import public_feed
 import publisher
 import summarizer
+import trends
 from scrapers import (
     scrape_ap_news,
     scrape_arstechnica,
@@ -437,6 +438,24 @@ def feed_latest(date: str | None = None, region: str | None = None) -> dict:
 def publish_latest(date: str | None = None, feed_url: str | None = None) -> dict:
     """Return WeChat/manual-delivery digest content without writing files."""
     return publisher.build_daily_digest(PLATFORMS, platform_meta, snapshot_date=date, feed_url=feed_url)
+
+
+@app.get("/api/trends")
+def trends_latest(
+    days: int = 7, region: str | None = None,
+    min_days: int = 2, min_platforms: int = 2, limit: int = 20,
+) -> dict:
+    """Cross-day persistent trends: topics that recur across days + platforms.
+
+    Deterministic (no LLM). `region` restricts the platform scope; `min_platforms`
+    filters out single-source sticky pages.
+    """
+    if region is not None and region not in {"cn", "intl"}:
+        raise HTTPException(400, "region must be cn or intl")
+    plats = platforms_for_region(region) if region else list(PLATFORMS.keys())
+    return trends.compute_trends(
+        plats, days_back=days, min_days=min_days, min_platforms=min_platforms, limit=limit
+    )
 
 
 # ---- prompt files ----

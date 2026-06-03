@@ -24,7 +24,7 @@ jobs:
         run: >-
           python -m compileall -q
           main.py curated.py public_feed.py publisher.py summarizer.py
-          briefer.py scrape_daily.py wechat_adapter.py
+          briefer.py scrape_daily.py wechat_adapter.py trends.py
           scripts/audit_public_release.py scripts/validate_feed.py
           scripts/publish_feed.py scripts/publish_wechat_draft.py
       - name: Validate exported feed JSON

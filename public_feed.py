@@ -20,6 +20,7 @@ import aggregator
 import briefer
 import db
 import summarizer
+import trends as trends_mod
 
 ROOT = Path(__file__).parent
 DEFAULT_FEED_DIR = ROOT / "feeds"
@@ -75,6 +76,7 @@ def build_public_feed(
         },
         "platforms": platform_payloads,
         "regions": region_payloads,
+        "trends": trends_mod.compute_trends(list(targets), days_back=7, limit=12),
         "brief": briefer.get_cached_brief(snap) if region is None else None,
     }
 

@@ -80,6 +80,7 @@ launchctl print "gui/$(id -u)/com.local.trending-scraper"
 - High-signal curated feed: `GET /api/curated/latest`
 - Static-feed payload: `GET /api/feed/latest`
 - Publish digest preview: `GET /api/publish/latest`
+- Persistence trends (cross-day + cross-platform): `GET /api/trends`
 - Prompt editor: `GET /api/prompts`, `POST /api/prompts/{prompt_id}`
 - Public feed files: `feeds/latest.json` and `feeds/YYYY-MM-DD.json`
 - Publish bundle files: `publish/latest.md`, `publish/latest.html`,

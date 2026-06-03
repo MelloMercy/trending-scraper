@@ -9,6 +9,7 @@
 - **17 个热点源**：国内 6（抖音 / 小红书 / B 站 / 知乎 / 36 氪 / 虎嗅）+ 国际 11（BBC World / Hacker News / The Verge / TechCrunch / NYT World / Ars Technica / Reuters / AP News / Politico / Axios / Semafor）。
 - **跨平台共识**：规则法找出出现在最多平台的「今日大故事」，并给标题级共识徽章。
 - **LLM 话题聚类 + Daily Brief**：DeepSeek 把标题聚成 5–10 个话题，再做跨地区每日简报（可选，配 key 启用；prompt 抽到 `prompts/*.md`，可对话式修改）。
+- **时间维度趋势**：跨天 + 跨平台聚类，找出持续发酵的话题（持续天数、连续 streak、上升/下降走向），无需 LLM；`trends.py` + `/api/trends`，并写进 feed 与在线 demo。
 - **高信号源**：follow-builders 的 X / 播客 / 博客 + 本地 `curated_sources.json` 的 RSS / newsletter。
 - **Public Feed**：导出 `feeds/*.json` 静态快照 + RSS（`latest.xml`）+ 零依赖静态前端（`index.html`）做在线 demo，可发布到 GitHub Pages / raw / R2 / S3，客户端免装 Playwright、免配 cookies。
 - **公众号发布链路**：每日精华导出 Markdown / HTML / 纯文本 + 公众号草稿 payload；草稿适配器把它推成公众号「草稿」（人工审核后再发）。
@@ -255,6 +256,18 @@ curl -s http://localhost:11001/api/curated/latest | jq
 
 如果上游某个 feed 失败，接口会返回 `status: "partial"` 并带 `errors`，页面会显示 warning，但可用内容仍继续展示。
 
+## 持续趋势（时间维度）
+
+大多数热榜只展示「今天」。本项目每天存快照，于是可以做**时间维度**：把最近 N 天、所有平台的条目用同样的字符 bigram 相似度聚类，找出**跨天 + 跨平台持续发酵**的话题。
+
+```bash
+curl -s "http://localhost:11001/api/trends?days=7&min_platforms=2" | jq
+```
+
+每条趋势给出：持续天数、最长连续 `streak`、覆盖平台、峰值排名、`rising/steady/falling` 走向，以及逐日 `timeline`。默认要求 ≥2 天且 ≥2 平台，过滤掉「单一来源常驻」的页面。结果也写进 public feed 的 `trends` 字段，并显示在在线 demo 的「📈 持续趋势」区。
+
+> 实现：`trends.py`，纯函数 `cluster_trends` 可单测；倒排 bigram 索引 + 文档频率截断让 3000+ 条目聚类 < 0.5s。
+
 ## Public Feed（中心化 feed 改造）
 
 如果要让别人的客户端“不装 Playwright / 不配 cookies / 不跑 scraper”，可以由一台发布机每天跑完整抓取，然后导出静态 JSON：
@@ -389,6 +402,7 @@ curl -s "http://localhost:11001/api/brief/today?force=true" | jq
 | GET | `/api/curated/latest` | 高信号源（follow-builders + 本地 RSS/Podcast） |
 | GET | `/api/feed/latest` | 可发布的静态 public feed payload |
 | GET | `/api/publish/latest` | 公众号/投递友好的每日精华预览 |
+| GET | `/api/trends` | 跨天持续趋势（跨平台 + 多日聚类，无 LLM）；支持 `days/region/min_platforms` |
 | GET | `/api/prompts` | Prompt 文件列表 + 内容 + 占位符校验 |
 | GET | `/api/prompts/{prompt_id}` | 单个 prompt 文件 |
 | POST | `/api/prompts/{prompt_id}` | 保存 prompt 文件（allowlist + placeholder 校验） |
@@ -413,7 +427,7 @@ curl -s "http://localhost:11001/api/brief/today?force=true" | jq
 - [x] ~~Skill 形态入口~~ → 已补 `SKILL.md`
 - [x] ~~feeds 公开发布（GitHub Pages/raw + R2/S3）~~ → `scripts/publish_feed.py` + GitHub Actions（validate-feed / publish-pages / sync-storage）
 - [x] ~~公众号草稿适配器~~ → `wechat_adapter.py` + `scripts/publish_wechat_draft.py`（只建草稿，人工审核后发）
-- [ ] 历史折线趋势图（哪些话题连续多天上榜）
+- [x] ~~历史折线趋势图（哪些话题连续多天上榜）~~ → `trends.py` 跨天/跨平台持续趋势 + `/api/trends` + demo「持续趋势」区（React 折线图可后续加）
 - [x] ~~在 launchd 抓取后自动预生成话题聚类~~ → `scrape_daily.py` 抓取后会跑 clustering + brief
 - [ ] 加更多平台（微博 / 头条 / 雪球）
 

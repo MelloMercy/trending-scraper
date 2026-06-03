@@ -98,6 +98,30 @@ function renderBrief(brief) {
   return box.children.length ? box : null;
 }
 
+function renderTrends(tobj) {
+  const list = (tobj && tobj.trends) || [];
+  if (!list.length) return null;
+  const arrows = { rising: "↑", falling: "↓", steady: "→", new: "•" };
+  const wrap = $("div", { className: "brief" });
+  for (const t of list) {
+    const row = $("div", { className: "topic" });
+    const head = $("div", { className: "t" });
+    const badge = `${arrows[t.trajectory] || ""} ${t.day_count}天`
+      + (t.streak > 1 ? ` 连${t.streak}` : "") + ` · ${t.platform_count}平台`;
+    head.append($("span", { className: "tag", textContent: badge }));
+    head.append(safeLink(t.title || "(无标题)", t.url));
+    row.append(head);
+    const tl = $("div", { className: "src" });
+    (t.timeline || []).forEach((d, i) => {
+      if (i) tl.append(document.createTextNode("  ›  "));
+      tl.append(document.createTextNode(`${(d.date || "").slice(5)}·${d.platforms.length}平台·#${d.best_rank}`));
+    });
+    row.append(tl);
+    wrap.append(row);
+  }
+  return wrap;
+}
+
 function renderPlatforms(platforms, region) {
   const cols = platforms.filter(p => p.region === region && (p.items || []).length);
   if (!cols.length) return null;
@@ -144,6 +168,9 @@ function fmt(dt) { return (dt || "").replace("T", " "); }
     const brief = renderBrief(d.brief);
     if (brief) { app.append($("h2", { textContent: "📋 今日简报" })); app.append(brief); }
     else { app.append($("p", { className: "empty", textContent: "（今日暂无缓存简报；下方为各平台榜单）" })); }
+
+    const tr = renderTrends(d.trends);
+    if (tr) { app.append($("h2", { textContent: "📈 持续趋势（近 7 天 · 跨平台）" })); app.append(tr); }
 
     for (const [region, label] of [["cn","国内"],["intl","国际"]]) {
       const grid = renderPlatforms(d.platforms || [], region);

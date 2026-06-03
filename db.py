@@ -134,6 +134,16 @@ def get_by_date(platform: str, snapshot_date: str) -> list[dict]:
         return [dict(r) for r in rows]
 
 
+def all_snapshot_dates(limit: int = 30) -> list[str]:
+    """Distinct snapshot dates across all platforms, most recent first."""
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT DISTINCT snapshot_date FROM trending_items ORDER BY snapshot_date DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+        return [r["snapshot_date"] for r in rows]
+
+
 def get_by_region(region: str, snapshot_date: str) -> list[dict]:
     """Return all items for a (region, snapshot_date) across all platforms in that region."""
     with get_conn() as conn:
