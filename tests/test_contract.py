@@ -6,9 +6,12 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+# Import the contract module directly, NOT via the `scrapers` package — its
+# __init__ pulls in Playwright-based scrapers that aren't installed in the lean
+# CI tests job. contract.py itself is dependency-free.
+sys.path.insert(0, str(ROOT / "scrapers"))
 
-from scrapers import contract  # noqa: E402
+import contract  # noqa: E402
 
 FIXTURE = Path(__file__).parent / "fixtures" / "sample_items.json"
 
