@@ -18,10 +18,12 @@ from datetime import date, datetime
 import aggregator
 import briefer
 import db
+import health
 import public_feed
 import publisher
 import summarizer
 from main import PLATFORMS, platform_meta, platforms_for_region
+from scrapers import contract
 
 
 async def run_one(name: str) -> tuple[str, int, str | None]:
@@ -30,6 +32,9 @@ async def run_one(name: str) -> tuple[str, int, str | None]:
     run_id = db.log_run_start(name)
     try:
         items = await meta["fn"]()
+        issues = contract.validate_items(items)
+        if issues:
+            print(f"  ⚠ {name}: {len(issues)} output-contract issue(s); first: {issues[0]}")
         count = db.save_items(name, items, region=region)
         db.log_run_finish(run_id, "ok", item_count=count)
         return name, count, None
@@ -92,7 +97,23 @@ async def main(
         run_public_feed_export()
     if do_publish and successful_targets:
         run_publish_export()
+    print_health_summary()
     return rc
+
+
+def print_health_summary() -> None:
+    """One-line source-health summary for the cron log."""
+    try:
+        h = health.compute_health(PLATFORMS, platform_meta)
+        s = h["summary"]
+        problems = [src["id"] for src in h["sources"] if src["status"] != "ok"]
+        line = (f"  health[{h['overall']}]: ok={s['ok']} stale={s['stale']} "
+                f"empty={s['empty']} failing={s['failing']}")
+        if problems:
+            line += f" — attention: {', '.join(problems[:8])}"
+        print(line)
+    except Exception as e:
+        print(f"  ⊘ health summary failed: {e}")
 
 
 async def run_brief() -> None:

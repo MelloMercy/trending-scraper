@@ -186,6 +186,22 @@ def log_run_finish(run_id: int, status: str, item_count: int = 0, error: str | N
         )
 
 
+def get_runs_by_platform(platform: str, limit: int = 20) -> list[dict]:
+    """Most recent scrape runs for one platform, newest first."""
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT snapshot_date, started_at, finished_at, status, item_count, error
+            FROM scrape_runs
+            WHERE platform = ?
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (platform, limit),
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
 def get_recent_runs(limit: int = 20) -> list[dict]:
     with get_conn() as conn:
         rows = conn.execute(

@@ -19,6 +19,7 @@ import briefer
 import config
 import curated
 import db
+import health
 import public_feed
 import publisher
 import summarizer
@@ -456,6 +457,19 @@ def trends_latest(
     return trends.compute_trends(
         plats, days_back=days, min_days=min_days, min_platforms=min_platforms, limit=limit
     )
+
+
+@app.get("/api/health")
+def health_status() -> dict:
+    """Per-source health: status, last good date, recent success rate."""
+    return health.compute_health(PLATFORMS, platform_meta)
+
+
+@app.get("/api/health/badge")
+def health_badge() -> dict:
+    """shields.io endpoint payload for a live source-health badge."""
+    h = health.compute_health(PLATFORMS, platform_meta)
+    return health.badge_payload(h["healthy"], h["total"], h["overall"])
 
 
 # ---- prompt files ----

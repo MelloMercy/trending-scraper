@@ -1,5 +1,10 @@
 # 每日热点聚合（国内 6 平台 + 国际 11 源 + 高信号源）
 
+[![validate-feed](https://github.com/MelloMercy/trending-scraper/actions/workflows/validate-feed.yml/badge.svg)](https://github.com/MelloMercy/trending-scraper/actions/workflows/validate-feed.yml)
+[![sources](https://img.shields.io/endpoint?url=https%3A%2F%2Fmellomercy.github.io%2Ftrending-scraper%2Fhealth.json)](https://mellomercy.github.io/trending-scraper/)
+[![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+· **[在线 demo](https://mellomercy.github.io/trending-scraper/)**
+
 本地部署的小工具：每天定时抓取 17 个热点源（国内：抖音 / 小红书 / B 站 / 知乎 / 36 氪 / 虎嗅；国际：BBC World / Hacker News / The Verge / TechCrunch / NYT World / Ars Technica / Reuters / AP News / Politico / Axios / Semafor），并额外聚合 AI/product/startup 高信号源。它会做**跨平台共识检测**、**LLM 话题聚类**、**Daily Brief** 和 **public feed 导出**，通过 FastAPI + React 前端展示。借鉴 alltop.com 的「多源汇聚」设计，也吸收了 follow-builders 的中心化 feed / prompt 文件 / skill 入口思路。
 
 前端：React 18 + TypeScript + Tailwind + shadcn/ui，源码在 `webui/`，build 后输出到 `static/`。详见 [webui/README.md](webui/README.md)。
@@ -15,6 +20,7 @@
 - **公众号发布链路**：每日精华导出 Markdown / HTML / 纯文本 + 公众号草稿 payload；草稿适配器把它推成公众号「草稿」（人工审核后再发）。
 - **前端**：网格 / 时间流视图、历史日期回看、Prompt 在线编辑。
 - **自动化**：macOS launchd 每日定时「抓取 → 聚类 → 简报 → 导出」；GitHub Actions 做 CI 门禁与 Pages 发布。
+- **可观测**：每源健康度（状态 / 最后成功日 / 成功率），`/api/health` + README 实时徽章 + demo 头部指示；抓取产出有输出契约校验。
 - **隐私边界**：密钥 / cookies / 本地数据全部 gitignore，附 `scripts/audit_public_release.py` 发布前扫描。
 
 ## 架构
@@ -30,6 +36,8 @@ trending-scraper/
 ├── public_feed.py          # 静态 public feed 构建器（GitHub/R2/S3 友好）
 ├── publisher.py            # 每日精华发布包（公众号/手动投递友好）
 ├── wechat_adapter.py       # 公众号草稿适配器（token/封面素材/draft.add）
+├── trends.py               # 跨天/跨平台持续趋势（时间维度，无 LLM）
+├── health.py               # 源健康度 / 可观测 + shields 徽章
 ├── similarity.py           # 字符 bigram + Jaccard 相似度
 ├── config.py               # 运行时配置加载器（含 schema）
 ├── config.example.json     # 配置模板（实际配置在 config.json，git 忽略）
@@ -52,6 +60,7 @@ trending-scraper/
 ├── SKILL.md                # agent/onboarding 操作入口
 ├── scrapers/
 │   ├── base.py             # Playwright 浏览器上下文（反检测配置）
+│   ├── contract.py         # 抓取产出契约校验（title/rank/url 等）
 │   ├── douyin.py           # 抖音：API 优先 + Playwright 兜底
 │   ├── xiaohongshu.py      # 小红书：双模式（cookies → 热搜榜 / 无 cookies → 发现页热门）
 │   ├── bilibili.py         # B 站：公开 API
@@ -355,6 +364,19 @@ curl -s http://localhost:11001/api/publish/latest | jq
 
 公众号网络调用用 `httpx.MockTransport` 打桩；37 个用例。CI 里也会跑（见下）。
 
+## 源健康与可观测
+
+抓取器会随平台改版而坏——这是这类项目真正的长期成本，所以每源都有健康度：
+
+```bash
+curl -s http://localhost:11001/api/health | jq '{overall, summary}'
+```
+
+- 状态分 `ok / stale / empty / failing / unknown`，给出最后成功日期、距今天数、近 N 次成功率、最近一次错误；`overall` 汇总为 `ok / degraded / down`，worst-first 排序让问题置顶。
+- 每日 `scrape_daily.py` 结尾打印一行健康概况进 `data/cron.log`。
+- 导出时写 `feeds/health.json`（shields 徽章端点）与 `feeds/health-full.json`，README 顶部徽章与在线 demo 头部都读它。
+- 抓取产出有输出契约（`scrapers/contract.py`）：标题非空、`rank` 合法、`url` 为 http(s) 或空——抓取时校验并告警，CI 里单测，防止某平台改版后悄悄灌入垃圾数据。
+
 ## 持续集成与 GitHub Actions
 
 仓库带三个工作流（`.github/workflows/`）：
@@ -403,6 +425,8 @@ curl -s "http://localhost:11001/api/brief/today?force=true" | jq
 | GET | `/api/feed/latest` | 可发布的静态 public feed payload |
 | GET | `/api/publish/latest` | 公众号/投递友好的每日精华预览 |
 | GET | `/api/trends` | 跨天持续趋势（跨平台 + 多日聚类，无 LLM）；支持 `days/region/min_platforms` |
+| GET | `/api/health` | 各源健康度（状态 / 最后成功日 / 成功率 / 最近错误） |
+| GET | `/api/health/badge` | shields.io 徽章端点（sources N/M ok） |
 | GET | `/api/prompts` | Prompt 文件列表 + 内容 + 占位符校验 |
 | GET | `/api/prompts/{prompt_id}` | 单个 prompt 文件 |
 | POST | `/api/prompts/{prompt_id}` | 保存 prompt 文件（allowlist + placeholder 校验） |

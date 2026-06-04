@@ -30,7 +30,7 @@ def main() -> int:
         region=args.region,
         base_url=args.base_url,
     )
-    for key in ("snapshot_date", "dated", "latest", "rss_latest", "rss_dated"):
+    for key in ("snapshot_date", "dated", "latest", "rss_latest", "rss_dated", "health"):
         if key in result:
             print(f"{key}={result[key]}")
     return 0

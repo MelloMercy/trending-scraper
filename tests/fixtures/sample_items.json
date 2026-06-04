@@ -1,0 +1,14 @@
+{
+  "_note": "Small samples of normalized scraper output, used to anchor the output contract (scrapers/contract.py) to realistic shapes.",
+  "bilibili": [
+    {"rank": 1, "title": "示例：某热门视频标题", "url": "https://www.bilibili.com/video/BV1xx411c7mD", "hot_value": "123.4万", "cover": "https://i0.hdslb.com/bfs/archive/abc.jpg"},
+    {"rank": 2, "title": "示例：第二个视频", "url": "https://www.bilibili.com/video/BV1yy411c7mE", "hot_value": "88.2万", "cover": null}
+  ],
+  "hackernews": [
+    {"rank": 1, "title": "Show HN: An example project", "url": "https://news.ycombinator.com/item?id=40000001", "hot_value": "512", "cover": null},
+    {"rank": 2, "title": "An article without a points label", "url": "https://example.com/post", "hot_value": null, "cover": null}
+  ],
+  "zhihu": [
+    {"rank": 1, "title": "示例知乎热榜问题？", "url": "https://www.zhihu.com/question/600000000", "hot_value": "1024 万热度", "cover": null}
+  ]
+}

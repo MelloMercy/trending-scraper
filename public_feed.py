@@ -19,6 +19,7 @@ from xml.sax.saxutils import escape
 import aggregator
 import briefer
 import db
+import health as health_mod
 import summarizer
 import trends as trends_mod
 
@@ -104,7 +105,7 @@ def write_public_feed(
         "dated": str(dated),
         "latest": str(latest),
     }
-    # RSS only for the all-region feed (the main human-subscribable digest).
+    # RSS + health only for the all-region feed (the main published artifacts).
     if region is None:
         rss = build_rss(payload, base_url=base_url)
         rss_dated = out / f"{payload['snapshot_date']}.xml"
@@ -113,6 +114,11 @@ def write_public_feed(
         _write_text(rss_latest, rss)
         result["rss_latest"] = str(rss_latest)
         result["rss_dated"] = str(rss_dated)
+
+        h = health_mod.compute_health(platforms, labeler)
+        _write_json(out / "health.json", health_mod.badge_payload(h["healthy"], h["total"], h["overall"]))
+        _write_json(out / "health-full.json", h)
+        result["health"] = str(out / "health.json")
     return result
 
 

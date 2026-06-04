@@ -160,9 +160,17 @@ function fmt(dt) { return (dt || "").replace("T", " "); }
       (d.generated_at ? ` · 生成于 ${fmt(d.generated_at)}` : "");
     const links = document.getElementById("links");
     for (const [t, href] of [["全部 JSON","./latest.json"],["国内","./latest-cn.json"],
-                             ["国际","./latest-intl.json"],["RSS","./latest.xml"]]) {
+                             ["国际","./latest-intl.json"],["RSS","./latest.xml"],["源健康","./health-full.json"]]) {
       links.append($("a", { href, textContent: t }));
     }
+
+    // optional live source-health indicator
+    try {
+      const h = await (await fetch("./health-full.json", { cache: "no-store" })).json();
+      const dot = { ok: "🟢", degraded: "🟡", down: "🔴", unknown: "⚪" }[h.overall] || "⚪";
+      document.getElementById("meta").append(
+        $("span", { textContent: ` · 源健康 ${dot} ${h.healthy}/${h.total}` }));
+    } catch (e) { /* health is optional */ }
 
     app.replaceChildren();
     const brief = renderBrief(d.brief);
