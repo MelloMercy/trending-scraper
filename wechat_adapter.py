@@ -24,7 +24,9 @@ WeChat gotchas handled here:
 from __future__ import annotations
 
 import json
+import struct
 import time
+import zlib
 from pathlib import Path
 from typing import Any
 
@@ -51,6 +53,28 @@ _ARTICLE_FIELDS = {
 }
 
 
+# Common errcodes mapped to actionable hints (the live-submit failure modes).
+ERRCODE_HINTS: dict[int, str] = {
+    -1: "微信系统繁忙，稍后重试。",
+    40013: "AppID 无效：检查 wechat_appid。",
+    40125: "AppSecret 无效：检查 wechat_appsecret（勿带空格/换行）。",
+    40164: "调用方 IP 不在白名单：公众平台 → 设置与开发 → 基本配置 → IP白名单，加入本机出口 IP。",
+    41001: "缺少 access_token。",
+    42001: "access_token 已过期（会自动刷新，重试即可）。",
+    45009: "接口调用频率超限（含 token 拉取限额），稍后再试。",
+    48001: "未授权此接口：草稿/素材接口通常需要【已认证的服务号】。",
+    53401: "封面不合规：thumb_media_id 无效或图片不符合要求。",
+}
+
+
+def explain(errcode: int | None) -> str:
+    """Actionable hint for a WeChat errcode, or '' if none known."""
+    try:
+        return ERRCODE_HINTS.get(int(errcode), "")  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return ""
+
+
 class WeChatError(RuntimeError):
     """A WeChat API call returned a non-zero errcode."""
 
@@ -58,8 +82,12 @@ class WeChatError(RuntimeError):
         self.errcode = errcode
         self.errmsg = errmsg
         self.context = context
+        self.hint = explain(errcode)
         where = f" during {context}" if context else ""
-        super().__init__(f"WeChat API error{where}: errcode={errcode} errmsg={errmsg!r}")
+        msg = f"WeChat API error{where}: errcode={errcode} errmsg={errmsg!r}"
+        if self.hint:
+            msg += f"\n  → {self.hint}"
+        super().__init__(msg)
 
 
 def _check(data: dict[str, Any], *, context: str) -> dict[str, Any]:
@@ -139,6 +167,24 @@ def get_access_token(
     if cache:
         _write_token_cache(cache, appid, token, now + expires_in)
     return token
+
+
+def verify_credentials(appid: str, appsecret: str, *, client: httpx.Client | None = None) -> dict[str, Any]:
+    """Fetch a fresh token to verify AppID/AppSecret AND the IP whitelist.
+
+    This is the cheapest live check: a token fetch exercises credentials and the
+    OA's IP-whitelist in one call, so the #1 live-submit blocker surfaces here
+    rather than at draft/add. Never caches; returns a result dict (no raise).
+    """
+    if not appid or not appsecret:
+        return {"ok": False, "errmsg": "appid/appsecret missing"}
+    try:
+        token = get_access_token(appid, appsecret, cache_path=None, client=client, force=True)
+        return {"ok": True, "token_prefix": token[:6] + "…"}
+    except WeChatError as e:
+        return {"ok": False, "errcode": e.errcode, "errmsg": e.errmsg, "hint": e.hint}
+    except (httpx.HTTPError, KeyError) as e:
+        return {"ok": False, "errmsg": f"{type(e).__name__}: {e}"}
 
 
 # ---- permanent cover upload ----
@@ -247,3 +293,40 @@ def add_draft(
         if owns:
             cli.close()
     return str(data["media_id"])
+
+
+# ---- default cover (so a missing cover isn't a live-submit blocker) ----
+
+def _png_bytes(width: int, height: int, rows: list[bytes]) -> bytes:
+    """Encode 8-bit RGB scanlines as a PNG. Pure stdlib (no Pillow)."""
+    def chunk(typ: bytes, data: bytes) -> bytes:
+        body = typ + data
+        return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body) & 0xFFFFFFFF)
+
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)  # 8-bit, colour type 2 (RGB)
+    raw = b"".join(b"\x00" + row for row in rows)                 # filter byte 0 per scanline
+    return (
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", ihdr)
+        + chunk(b"IDAT", zlib.compress(raw, 9))
+        + chunk(b"IEND", b"")
+    )
+
+
+def make_default_cover(path: Path | str, width: int = 900, height: int = 383) -> Path:
+    """Write a simple branded gradient cover (≈2.35:1) for use as the article thumb.
+
+    It's a plain placeholder so the live submit isn't blocked on a missing cover;
+    supply a real image with --cover for actual publishing.
+    """
+    rows = []
+    for y in range(height):
+        t = y / (height - 1) if height > 1 else 0
+        r = int(18 + t * 14)
+        g = int(26 + t * 24)
+        b = int(46 + t * 66)
+        rows.append(bytes((r, g, b)) * width)
+    out = Path(path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_bytes(_png_bytes(width, height, rows))
+    return out

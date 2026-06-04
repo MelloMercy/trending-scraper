@@ -346,9 +346,11 @@ curl -s http://localhost:11001/api/publish/latest | jq
 `publish/latest-wechat-draft.json` 可直接喂给公众号草稿适配器。它只建**草稿**，不群发、不发布——你在公众号后台「草稿箱」里审核后再发：
 
 ```bash
-# dry-run（默认）：加载草稿、打印计划、列出还差什么
+# 1. dry-run（默认）：加载草稿、打印计划、列出还差什么
 .venv/bin/python scripts/publish_wechat_draft.py
-# 真正提交：token → 上传封面为永久素材（thumb_media_id）→ draft/add
+# 2. live 预检（不创建任何东西）：拉 token 验证 AppID/Secret + IP 白名单（最常见的坑）
+.venv/bin/python scripts/publish_wechat_draft.py --check
+# 3. 预检 READY 后提交：token → 上传封面（缺省自动生成占位封面）→ draft/add
 .venv/bin/python scripts/publish_wechat_draft.py --cover cover.jpg --submit
 ```
 

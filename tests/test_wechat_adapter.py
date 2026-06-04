@@ -4,6 +4,7 @@ All HTTP is faked with httpx.MockTransport; no network and no credentials.
 """
 
 import json
+import struct
 import sys
 import unittest
 from pathlib import Path
@@ -173,5 +174,48 @@ class UploadThumbTests(unittest.TestCase):
             self.assertEqual(media_id, "THUMB_9")
 
 
+class ExplainTests(unittest.TestCase):
+    def test_known_errcode_hint(self):
+        self.assertIn("白名单", wx.explain(40164))
+
+    def test_unknown_and_none(self):
+        self.assertEqual(wx.explain(999999), "")
+        self.assertEqual(wx.explain(None), "")
+
+    def test_error_message_includes_hint(self):
+        e = wx.WeChatError(40164, "invalid ip")
+        self.assertEqual(e.hint, wx.explain(40164))
+        self.assertIn("白名单", str(e))
+
+
+class VerifyCredentialsTests(unittest.TestCase):
+    def test_success(self):
+        cli = client_returning({"/cgi-bin/token": ({"access_token": "TOKABC123", "expires_in": 7200}, 200)})
+        res = wx.verify_credentials("app", "sec", client=cli)
+        self.assertTrue(res["ok"])
+        self.assertTrue(res["token_prefix"].startswith("TOKABC"))
+
+    def test_failure_carries_hint(self):
+        cli = client_returning({"/cgi-bin/token": ({"errcode": 40164, "errmsg": "invalid ip"}, 200)})
+        res = wx.verify_credentials("app", "sec", client=cli)
+        self.assertFalse(res["ok"])
+        self.assertEqual(res["errcode"], 40164)
+        self.assertIn("白名单", res["hint"])
+
+    def test_missing_creds(self):
+        self.assertFalse(wx.verify_credentials("", "")["ok"])
+
+
+class CoverTests(unittest.TestCase):
+    def test_make_default_cover_valid_png(self):
+        with TemporaryDirectory() as d:
+            p = wx.make_default_cover(Path(d) / "cover.png", width=120, height=51)
+            raw = p.read_bytes()
+            self.assertTrue(raw.startswith(b"\x89PNG\r\n\x1a\n"))
+            self.assertEqual(struct.unpack(">I", raw[16:20])[0], 120)
+            self.assertEqual(struct.unpack(">I", raw[20:24])[0], 51)
+
+
 if __name__ == "__main__":
     unittest.main()
+

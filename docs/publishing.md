@@ -136,18 +136,41 @@ export WECHAT_APPSECRET="..."
 - `--cover path/to/cover.jpg` — uploaded as a permanent image material at submit
   time; its `media_id` becomes the thumb.
 - `--thumb-media-id <id>` — reuse a permanent material you uploaded earlier.
+- nothing — a simple placeholder cover is generated (pure-Python, ≈2.35:1) so the
+  submit isn't blocked; supply a real `--cover` for actual publishing.
 
-### Run
+### Run — 3 steps to go live
 
 ```bash
-# Dry-run (default): loads the draft, prints the plan, lists what's still needed.
+# 1. Dry-run (default): load the draft, print the plan, list what's missing.
 .venv/bin/python scripts/publish_wechat_draft.py
 
-# Live submit:
+# 2. Preflight against the live API WITHOUT creating anything: it fetches an
+#    access token (verifies AppID/AppSecret AND the IP whitelist — the #1 live
+#    blocker) and validates the draft + cover.
+.venv/bin/python scripts/publish_wechat_draft.py --check
+
+# 3. Once --check reports READY, create the draft:
 .venv/bin/python scripts/publish_wechat_draft.py --cover cover.jpg --submit
-# or for a specific day's bundle:
-.venv/bin/python scripts/publish_wechat_draft.py --date 2026-06-01 --cover cover.jpg --submit
+#    (omit --cover to use the placeholder; --date YYYY-MM-DD for a past bundle)
 ```
+
+`--check` is the fast path to a first-try live submit: if it reports
+`errcode=40164` your server IP isn't whitelisted, `40125` means a bad AppSecret,
+etc. (table below). It creates nothing, so it's safe to run repeatedly.
+
+### Common errcodes
+
+The adapter maps these to actionable hints in its output:
+
+| errcode | meaning / fix |
+|---------|---------------|
+| 40013 | AppID invalid — check `wechat_appid` |
+| 40125 | AppSecret invalid — check `wechat_appsecret` (no stray spaces/newlines) |
+| 40164 | caller IP not in whitelist — add your egress IP under 基本配置 → IP白名单 |
+| 45009 | rate limited (token fetch has a quota too) — back off |
+| 48001 | API unauthorized — draft/material APIs usually need a **verified service account** |
+| 53401 | cover/thumb invalid |
 
 ### Operational caveats
 

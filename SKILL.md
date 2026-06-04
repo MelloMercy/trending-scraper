@@ -148,8 +148,14 @@ creates a **draft** — a human publishes from the WeChat editor:
 
 ```bash
 .venv/bin/python scripts/publish_wechat_draft.py                  # dry-run
+.venv/bin/python scripts/publish_wechat_draft.py --check           # live preflight (token + IP whitelist)
 .venv/bin/python scripts/publish_wechat_draft.py --cover cover.jpg --submit
 ```
+
+`--check` creates nothing; it fetches a token to verify credentials + the OA IP
+whitelist (the most common live blocker) and reports errcode-specific hints. A
+placeholder cover is auto-generated if neither `--cover` nor `--thumb-media-id`
+is given.
 
 Credentials resolve from `config.json` (`wechat_appid` / `wechat_appsecret`,
 the secret masked by `/api/config`) or env `WECHAT_APPID` / `WECHAT_APPSECRET`.
